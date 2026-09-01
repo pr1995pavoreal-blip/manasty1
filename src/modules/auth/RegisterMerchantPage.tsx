@@ -149,7 +149,7 @@ export const RegisterMerchantPage: React.FC = () => {
                     placeholder="مثال: محمصة ومقهى الذهب"
                     value={formData.businessNameAr}
                     onChange={(e) => setFormData({ ...formData, businessNameAr: e.target.value })}
-                    className="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition"
+                    className="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-xs font-bold text-[#0F172A] bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition"
                   />
                 </div>
 
@@ -163,7 +163,7 @@ export const RegisterMerchantPage: React.FC = () => {
                     placeholder="Golden Coffee & Cafe"
                     value={formData.businessName}
                     onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                    className="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition"
+                    className="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-xs font-bold text-[#0F172A] bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition"
                   />
                 </div>
               </div>
@@ -177,7 +177,7 @@ export const RegisterMerchantPage: React.FC = () => {
                   <select
                     value={formData.categoryName}
                     onChange={(e) => setFormData({ ...formData, categoryName: e.target.value })}
-                    className="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition cursor-pointer"
+                    className="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-xs font-bold text-[#0F172A] bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition cursor-pointer"
                   >
                     <option value="مقاهي ومطاعم">مقاهي ومطاعم (Coffee & Cafe)</option>
                     <option value="تجزئة وتسوق">تجزئة وتسوق (Retail & Shopping)</option>
@@ -196,7 +196,7 @@ export const RegisterMerchantPage: React.FC = () => {
                       placeholder="1010889922"
                       value={formData.commercialReg}
                       onChange={(e) => setFormData({ ...formData, commercialReg: e.target.value })}
-                      className="w-full h-11 pr-10 pl-3 rounded-xl border border-slate-200 text-xs font-mono font-bold bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition"
+                      className="w-full h-11 pr-10 pl-3 rounded-xl border border-slate-200 text-xs font-mono font-bold text-[#0F172A] bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition"
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
                       <FileText size={16} />
@@ -228,7 +228,7 @@ export const RegisterMerchantPage: React.FC = () => {
                       placeholder="الاسم الكامل"
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className="w-full h-11 pr-10 pl-3 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition"
+                      className="w-full h-11 pr-10 pl-3 rounded-xl border border-slate-200 text-xs font-bold text-[#0F172A] bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition"
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
                       <User size={16} />
@@ -244,7 +244,7 @@ export const RegisterMerchantPage: React.FC = () => {
                       placeholder="+966500000000"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full h-11 pr-10 pl-3 rounded-xl border border-slate-200 text-xs font-mono font-semibold bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition"
+                      className="w-full h-11 pr-10 pl-3 rounded-xl border border-slate-200 text-xs font-mono font-bold text-[#0F172A] bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition"
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
                       <Phone size={16} />
@@ -266,7 +266,7 @@ export const RegisterMerchantPage: React.FC = () => {
                       placeholder="owner@store.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full h-11 pr-10 pl-3 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition"
+                      className="w-full h-11 pr-10 pl-3 rounded-xl border border-slate-200 text-xs font-bold text-[#0F172A] bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition"
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
                       <Mail size={16} />
@@ -286,7 +286,7 @@ export const RegisterMerchantPage: React.FC = () => {
                       placeholder="••••••••"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full h-11 pr-10 pl-3 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition"
+                      className="w-full h-11 pr-10 pl-3 rounded-xl border border-slate-200 text-xs font-bold text-[#0F172A] bg-slate-50 focus:bg-white focus:border-emerald-500 outline-none transition"
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
                       <Lock size={16} />
