@@ -211,20 +211,35 @@ export const NearbyStoresPage: React.FC = () => {
                 }`}
               >
                 <div>
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className={`text-base font-black ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
-                      {branch.merchant?.businessNameAr || branch.merchant?.businessName || branch.name}
-                    </h3>
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {branch.merchant?.logoUrl ? (
+                        <img
+                          src={branch.merchant.logoUrl}
+                          alt={branch.merchant?.businessNameAr || branch.merchant?.businessName}
+                          className="w-12 h-12 rounded-2xl object-cover border border-slate-200 dark:border-slate-800 shadow-md shrink-0"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-2xl bg-indigo-600/10 text-indigo-500 flex items-center justify-center font-bold text-lg shrink-0 border border-indigo-500/20">
+                          <Store size={22} />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <h3 className={`text-base font-black truncate ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
+                          {branch.merchant?.businessNameAr || branch.merchant?.businessName || branch.name}
+                        </h3>
+                        <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 truncate mt-0.5">
+                          فرع: {branch.nameAr || branch.name}
+                        </p>
+                      </div>
+                    </div>
+
                     {branch.distanceKm !== null && branch.distanceKm !== undefined && (
                       <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-mono shrink-0">
                         يبعد {branch.distanceKm} كم
                       </span>
                     )}
                   </div>
-
-                  <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-3">
-                    فرع: {branch.nameAr || branch.name}
-                  </p>
 
                   <div className={`space-y-2 text-xs font-semibold mb-5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                     <div className="flex items-center gap-2">
@@ -288,9 +303,17 @@ export const NearbyStoresPage: React.FC = () => {
             {/* Modal Header */}
             <div className={`p-5 sm:p-6 border-b flex items-start justify-between gap-4 ${isDark ? 'border-slate-800/80 bg-slate-900/40' : 'border-slate-100 bg-slate-50'}`}>
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-indigo-500/20 shrink-0">
-                  <Store size={24} />
-                </div>
+                {selectedBranch.merchant?.logoUrl ? (
+                  <img
+                    src={selectedBranch.merchant.logoUrl}
+                    alt={selectedBranch.merchant?.businessNameAr || selectedBranch.merchant?.businessName}
+                    className="w-14 h-14 rounded-2xl object-cover border border-slate-200 dark:border-slate-800 shadow-md shrink-0"
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-indigo-500/20 shrink-0">
+                    <Store size={26} />
+                  </div>
+                )}
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <h2 className={`text-lg sm:text-xl font-black ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
@@ -430,26 +453,39 @@ export const NearbyStoresPage: React.FC = () => {
                               isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-slate-50 border-slate-200/90'
                             }`}
                           >
-                            <div className="space-y-1.5">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <h5 className={`text-xs font-black ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
-                                  {offer.titleAr || offer.title}
-                                </h5>
-                                <span className="px-2 py-0.5 rounded-lg text-[10px] font-black bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30">
-                                  تخفيض %{offer.discountPercent}
-                                </span>
-                              </div>
-                              {offer.description && (
-                                <p className={`text-xs font-medium leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                                  {offer.description}
-                                </p>
-                              )}
-                              {(offer.category || offer.product) && (
-                                <div className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">
-                                  {offer.category && <span>الفئة: {offer.category.nameAr || offer.category.name} </span>}
-                                  {offer.product && <span>المنتج: {offer.product.nameAr || offer.product.name}</span>}
+                            <div className="flex items-start sm:items-center gap-3.5 flex-1 min-w-0">
+                              {offer.imageUrl ? (
+                                <img
+                                  src={offer.imageUrl}
+                                  alt={offer.titleAr || offer.title}
+                                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border border-slate-200 dark:border-slate-800 shadow-sm shrink-0"
+                                />
+                              ) : (
+                                <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-bold shrink-0">
+                                  <Tag size={22} />
                                 </div>
                               )}
+                              <div className="space-y-1.5 min-w-0 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <h5 className={`text-xs sm:text-sm font-black ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
+                                    {offer.titleAr || offer.title}
+                                  </h5>
+                                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-black bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30">
+                                    تخفيض %{offer.discountPercent}
+                                  </span>
+                                </div>
+                                {offer.description && (
+                                  <p className={`text-xs font-medium leading-relaxed line-clamp-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                                    {offer.description}
+                                  </p>
+                                )}
+                                {(offer.category || offer.product) && (
+                                  <div className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold">
+                                    {offer.category && <span>الفئة: {offer.category.nameAr || offer.category.name} </span>}
+                                    {offer.product && <span>المنتج: {offer.product.nameAr || offer.product.name}</span>}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                             <div className={`flex items-center gap-1 text-[11px] font-mono shrink-0 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                               <Calendar size={13} className="text-slate-400" />
