@@ -49,7 +49,16 @@ export const RegisterMerchantPage: React.FC = () => {
         navigate('/login');
       }, 3500);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'تعذر تسجيل المتجر. يرجى التأكد من البيانات وإعادة المحاولة.');
+      const isTooLarge =
+        err.response?.status === 413 ||
+        err.message?.toLowerCase().includes('too large') ||
+        err.response?.data?.message?.toLowerCase().includes('too large');
+
+      if (isTooLarge) {
+        setError('حجم البيانات أو صورة الشعار المرفوعة كبير جداً. يرجى اختيار صورة شعار أصلية بحجم أصغر (أقل من 500KB).');
+      } else {
+        setError(err.response?.data?.message || 'تعذر تسجيل المتجر. يرجى التأكد من البيانات وإعادة المحاولة.');
+      }
     } finally {
       setLoading(false);
     }
