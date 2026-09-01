@@ -231,7 +231,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenScanner }) =
       </div>
 
       {/* 5 Top Summary Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
         {/* Card 1: العمليات اليوم */}
         <div
           className={`p-5 rounded-2xl border transition-all duration-200 hover:-translate-y-1 shadow-sm ${

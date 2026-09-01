@@ -96,39 +96,39 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onOpenScanne
     >
       {/* Top Navigation Header */}
       <header
-        className={`h-16 border-b backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6 transition-colors ${
+        className={`h-14 sm:h-16 border-b backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-2.5 sm:px-6 transition-colors ${
           isDark
             ? 'bg-[#0B0F19]/90 border-slate-800/80 text-white'
             : 'bg-white/90 border-slate-200 text-[#0F172A] shadow-sm'
         }`}
       >
         {/* Right Side Brand & Mobile Toggle */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className={`p-2 rounded-xl transition ${
+            className={`p-1.5 sm:p-2 rounded-xl transition ${
               isDark
                 ? 'text-slate-400 hover:text-white hover:bg-slate-800'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
             title="القائمة"
           >
-            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
 
-          <Link to="/" className="flex items-center gap-2 sm:gap-3 no-underline min-w-0">
+          <Link to="/" className="flex items-center gap-2 no-underline min-w-0">
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black shadow-md shadow-indigo-600/30 shrink-0">
-              <ShieldCheck size={20} className="sm:w-[22px] sm:h-[22px]" />
+              <ShieldCheck size={18} className="sm:w-[22px] sm:h-[22px]" />
             </div>
             <div className="min-w-0">
               <span
-                className={`font-black text-xs sm:text-base block leading-tight tracking-tight truncate max-w-[130px] min-[380px]:max-w-[200px] sm:max-w-none ${
+                className={`font-black text-xs sm:text-base block leading-tight tracking-tight truncate max-w-[100px] min-[360px]:max-w-[150px] sm:max-w-none ${
                   isDark ? 'text-white' : 'text-[#0F172A]'
                 }`}
               >
-                المنصة الموحدة للعضويات والخصومات
+                المنصة الموحدة
               </span>
-              <span className="text-[8px] sm:text-[9px] text-indigo-400 font-mono tracking-widest uppercase block font-semibold truncate">
+              <span className="text-[8px] sm:text-[9px] text-indigo-400 font-mono tracking-widest uppercase hidden sm:block font-semibold truncate">
                 ENTERPRISE SAAS PORTAL
               </span>
             </div>
@@ -136,12 +136,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onOpenScanne
         </div>
 
         {/* Left Side Actions */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Quick Scanner Button for Merchants */}
           {isMerchant && onOpenScanner && (
             <button
               onClick={onOpenScanner}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-indigo-600/20 transition"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-indigo-600/20 transition"
+              title="مسح العضوية"
             >
               <QrCode size={16} />
               <span className="hidden md:inline">مسح العضوية</span>
@@ -151,40 +152,40 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onOpenScanne
           {/* Theme Mode Toggle (Dark / Light) */}
           <button
             onClick={toggleTheme}
-            className={`p-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition ${
+            className={`p-1.5 sm:p-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition ${
               isDark
                 ? 'bg-slate-800/80 hover:bg-slate-700 text-amber-400 border-slate-700'
                 : 'bg-slate-100 hover:bg-slate-200 text-indigo-600 border-slate-200'
             }`}
             title={isDark ? 'تفعيل الوضع النهاري' : 'تفعيل الوضع الليلي'}
           >
-            {isDark ? <Sun size={18} /> : <Moon size={18} />}
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
           {/* Language Switcher */}
           <button
             onClick={toggleLanguage}
-            className={`px-2.5 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition ${
+            className={`px-2 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1 transition ${
               isDark
                 ? 'bg-slate-800/80 hover:bg-slate-700 text-slate-200 border-slate-700'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
             }`}
           >
-            <Globe size={15} className="text-indigo-400" />
-            <span>{i18n.language.startsWith('ar') ? 'العربية' : 'English'}</span>
+            <Globe size={14} className="text-indigo-400 shrink-0" />
+            <span className="hidden min-[400px]:inline">{i18n.language.startsWith('ar') ? 'العربية' : 'EN'}</span>
           </button>
 
           {/* Notifications Bell */}
           <div className="relative">
             <button
-              className={`p-2 rounded-xl border relative transition ${
+              className={`p-1.5 sm:p-2 rounded-xl border relative transition ${
                 isDark
                   ? 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-700'
                   : 'bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-200'
               }`}
             >
-              <Bell size={18} />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-indigo-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center">
+              <Bell size={16} />
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-indigo-600 text-white rounded-full text-[9px] font-bold flex items-center justify-center">
                 3
               </span>
             </button>
@@ -194,14 +195,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onOpenScanne
           <div className="relative">
             <button
               onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border transition ${
+              className={`flex items-center gap-1.5 p-1 sm:px-3 sm:py-1.5 rounded-xl border transition ${
                 isDark
                   ? 'bg-slate-800/90 hover:bg-slate-800 border-slate-700'
                   : 'bg-slate-100 hover:bg-slate-200 border-slate-200'
               }`}
             >
-              <div className="w-7 h-7 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold text-xs">
-                <User size={15} />
+              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold text-xs shrink-0">
+                <User size={14} />
               </div>
               <div className="text-right hidden sm:block">
                 <span className={`text-xs font-bold block leading-tight ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
@@ -215,19 +216,19 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onOpenScanne
 
             {userDropdownOpen && (
               <div
-                className={`absolute left-0 mt-2 w-52 border rounded-2xl shadow-2xl p-2 z-50 animate-fadeIn ${
+                className={`absolute left-0 mt-2 w-48 border rounded-2xl shadow-2xl p-2 z-50 animate-fadeIn ${
                   isDark ? 'bg-[#0F172A] border-slate-700 text-white' : 'bg-white border-slate-200 text-[#0F172A]'
                 }`}
               >
                 <div className="px-3 py-2 border-b border-slate-700/50">
-                  <p className="text-xs font-bold m-0">{user.fullName}</p>
+                  <p className="text-xs font-bold m-0 truncate">{user.fullName}</p>
                   <p className="text-[10px] text-slate-400 font-mono m-0 truncate">{user.email}</p>
                 </div>
                 <button
                   onClick={handleLogout}
                   className="w-full mt-1 text-red-500 hover:bg-red-500/10 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition"
                 >
-                  <LogOut size={15} />
+                  <LogOut size={14} />
                   <span>تسجيل الخروج</span>
                 </button>
               </div>
@@ -604,11 +605,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onOpenScanne
 
         {/* Main Content Area */}
         <main
-          className={`flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 transition-colors ${
+          className={`flex-1 overflow-y-auto p-3 sm:p-6 lg:p-8 max-w-full overflow-x-hidden transition-colors ${
             isDark ? 'bg-[#090D16]' : 'bg-[#F8FAFC]'
           }`}
         >
-          <div className="max-w-7xl mx-auto">{children}</div>
+          <div className="max-w-7xl mx-auto w-full">{children}</div>
         </main>
       </div>
     </div>
