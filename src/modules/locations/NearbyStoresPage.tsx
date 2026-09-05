@@ -22,6 +22,10 @@ import {
   Utensils,
   Smartphone,
   Building2,
+  Search,
+  Maximize2,
+  Package,
+  Eye,
 } from 'lucide-react';
 
 export const NearbyStoresPage: React.FC = () => {
@@ -34,6 +38,8 @@ export const NearbyStoresPage: React.FC = () => {
   const [coords, setCoords] = useState<{ lat?: number; lon?: number }>({});
   const [selectedBranch, setSelectedBranch] = useState<MerchantBranch | null>(null);
   const [activeTab, setActiveTab] = useState<'discounts' | 'products'>('discounts');
+  const [modalSearch, setModalSearch] = useState<string>('');
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCategories();
@@ -511,87 +517,142 @@ export const NearbyStoresPage: React.FC = () => {
                 </div>
               ) : (
                 /* Products Tab */
-                <div>
-                  {selectedBranch.merchant?.products && selectedBranch.merchant.products.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {selectedBranch.merchant.products.map((product: Product & { category?: any }) => {
-                        const firstDiscount = selectedBranch.merchant?.discounts?.[0];
-                        const discountVal = firstDiscount?.discountValue || 0;
-                        const hasDiscount = discountVal > 0;
-                        const finalPrice = hasDiscount
-                          ? firstDiscount?.discountType === 'PERCENTAGE'
-                            ? product.price * (1 - discountVal / 100)
-                            : Math.max(0, product.price - discountVal)
-                          : product.price;
-
-                        return (
-                          <div
-                            key={product.id}
-                            className={`p-4 rounded-2xl border flex flex-col justify-between transition hover:border-indigo-500/50 shadow-sm ${
-                              isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-slate-50 border-slate-200/90'
-                            }`}
-                          >
-                            <div>
-                              <div className={`w-full h-24 rounded-xl mb-3 overflow-hidden flex items-center justify-center relative border ${
-                                isDark ? 'bg-slate-800/50 border-slate-700/40' : 'bg-slate-200/60 border-slate-300/60'
-                              }`}>
-                                {product.imageUrl ? (
-                                  <img
-                                    src={product.imageUrl}
-                                    alt={product.nameAr || product.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <ShoppingBag size={28} className={isDark ? 'text-slate-500 opacity-60' : 'text-slate-400'} />
-                                )}
-                                {hasDiscount && (
-                                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-lg text-[9px] font-black bg-rose-500 text-white shadow">
-                                    مخصوم
-                                  </span>
-                                )}
-                              </div>
-
-                              <h5 className={`text-xs font-black mb-1 ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
-                                {product.nameAr || product.name}
-                              </h5>
-                              {product.category && (
-                                <span className="inline-block text-[10px] text-indigo-600 dark:text-indigo-400 font-bold mb-2">
-                                  {product.category.nameAr || product.category.name}
-                                </span>
-                              )}
-                              {product.description && (
-                                <p className={`text-[11px] line-clamp-2 leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                                  {product.description}
-                                </p>
-                              )}
-                            </div>
-
-                            <div className={`mt-3 pt-2 border-t flex items-center justify-between ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
-                              <span className={`text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>السعر:</span>
-                              <div className="flex items-center gap-1.5">
-                                {hasDiscount && (
-                                  <span className="text-[11px] text-slate-400 line-through font-mono">
-                                    {product.price} ر.س
-                                  </span>
-                                )}
-                                <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
-                                  {finalPrice.toFixed(2)} ر.س
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className={`p-8 text-center rounded-2xl border ${isDark ? 'border-slate-800/80 bg-slate-900/30' : 'border-slate-200 bg-slate-50'}`}>
-                      <ShoppingBag size={36} className="mx-auto text-slate-400 mb-2 opacity-70" />
-                      <p className={`text-xs font-black ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>لا توجد منتجات محددة بالمركز حالياً</p>
-                      <p className={`text-[11px] font-semibold mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                        يمكنك الاطلاع على قائمة الخدمات الكاملة مباشرة في مقر الفرع والاستفادة من خصم العضوية.
-                      </p>
+                <div className="space-y-4">
+                  {/* Search inside Products Tab */}
+                  {selectedBranch.merchant?.products && selectedBranch.merchant.products.length > 0 && (
+                    <div className="relative">
+                      <Search size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        placeholder="ابحث عن منتج بالاسم أو الوصف..."
+                        value={modalSearch}
+                        onChange={(e) => setModalSearch(e.target.value)}
+                        className={`w-full h-10 pr-10 pl-4 rounded-xl border text-xs font-semibold outline-none transition ${
+                          isDark
+                            ? 'bg-slate-900 border-slate-800 text-white focus:border-indigo-500'
+                            : 'bg-slate-50 border-slate-200 text-[#0F172A] focus:border-indigo-500'
+                        }`}
+                      />
                     </div>
                   )}
+
+                  {(() => {
+                    const allProducts = selectedBranch.merchant?.products || [];
+                    const filtered = allProducts.filter((p) => {
+                      if (!modalSearch.trim()) return true;
+                      const q = modalSearch.toLowerCase();
+                      return (
+                        p.name?.toLowerCase().includes(q) ||
+                        (p.nameAr && p.nameAr.toLowerCase().includes(q)) ||
+                        (p.description && p.description.toLowerCase().includes(q))
+                      );
+                    });
+
+                    if (allProducts.length === 0) {
+                      return (
+                        <div className={`p-8 text-center rounded-2xl border ${isDark ? 'border-slate-800/80 bg-slate-900/30' : 'border-slate-200 bg-slate-50'}`}>
+                          <ShoppingBag size={36} className="mx-auto text-slate-400 mb-2 opacity-70" />
+                          <p className={`text-xs font-black ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>لا توجد منتجات محددة بالمركز حالياً</p>
+                          <p className={`text-[11px] font-semibold mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                            يمكنك الاطلاع على قائمة الخدمات والخصومات المباشرة بالفرع.
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    if (filtered.length === 0) {
+                      return (
+                        <div className="text-center py-8 text-xs font-bold text-slate-400">
+                          لا توجد نتائج تطابق "{modalSearch}"
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                        {filtered.map((product: Product & { category?: any }) => {
+                          const firstDiscount = selectedBranch.merchant?.discounts?.[0];
+                          const discountVal = firstDiscount?.discountValue || 0;
+                          const hasDiscount = discountVal > 0;
+                          const finalPrice = hasDiscount
+                            ? firstDiscount?.discountType === 'PERCENTAGE'
+                              ? product.price * (1 - discountVal / 100)
+                              : Math.max(0, product.price - discountVal)
+                            : product.price;
+
+                          return (
+                            <div
+                              key={product.id}
+                              className={`p-4 rounded-2xl border flex flex-col justify-between transition hover:border-indigo-500/50 shadow-sm ${
+                                isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-slate-50 border-slate-200/90'
+                              }`}
+                            >
+                              <div>
+                                <div className={`w-full h-36 rounded-xl mb-3 overflow-hidden flex items-center justify-center relative border group ${
+                                  isDark ? 'bg-slate-800/50 border-slate-700/40' : 'bg-slate-200/60 border-slate-300/60'
+                                }`}>
+                                  {product.imageUrl ? (
+                                    <>
+                                      <img
+                                        src={product.imageUrl}
+                                        alt={product.nameAr || product.name}
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                      />
+                                      <button
+                                        onClick={() => setPreviewImage(product.imageUrl!)}
+                                        className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1.5"
+                                      >
+                                        <Maximize2 size={16} />
+                                        <span>عرض الصورة بالكامل</span>
+                                      </button>
+                                    </>
+                                  ) : (
+                                    <div className="flex flex-col items-center justify-center text-slate-400 gap-1">
+                                      <ShoppingBag size={32} className="opacity-60" />
+                                      <span className="text-[10px] font-bold">بدون صورة</span>
+                                    </div>
+                                  )}
+                                  {hasDiscount && (
+                                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded-lg text-[9px] font-black bg-rose-500 text-white shadow">
+                                      مخصوم %{firstDiscount?.discountValue}
+                                    </span>
+                                  )}
+                                </div>
+
+                                <h5 className={`text-xs font-black mb-1 line-clamp-1 ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
+                                  {product.nameAr || product.name}
+                                </h5>
+                                {product.category && (
+                                  <span className="inline-block text-[10px] text-indigo-600 dark:text-indigo-400 font-bold mb-1.5">
+                                    {product.category.nameAr || product.category.name}
+                                  </span>
+                                )}
+                                {product.description && (
+                                  <p className={`text-[11px] line-clamp-2 leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                    {product.description}
+                                  </p>
+                                )}
+                              </div>
+
+                              <div className={`mt-3 pt-2 border-t flex items-center justify-between ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
+                                <span className={`text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>السعر:</span>
+                                <div className="flex items-center gap-1.5">
+                                  {hasDiscount && (
+                                    <span className="text-[11px] text-slate-400 line-through font-mono">
+                                      {product.price} ر.س
+                                    </span>
+                                  )}
+                                  <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+                                    {finalPrice.toFixed(2)} ر.س
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
             </div>
@@ -609,6 +670,24 @@ export const NearbyStoresPage: React.FC = () => {
                 إغلاق
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Lightbox Image Preview Modal */}
+      {previewImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fadeIn"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] overflow-hidden rounded-3xl shadow-2xl border border-slate-700/50">
+            <img src={previewImage} alt="صورة المنتج" className="max-w-full max-h-[85vh] object-contain rounded-3xl" />
+            <button
+              onClick={() => setPreviewImage(null)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-slate-900/80 hover:bg-slate-900 text-white border border-slate-700 transition"
+            >
+              <X size={20} />
+            </button>
           </div>
         </div>
       )}

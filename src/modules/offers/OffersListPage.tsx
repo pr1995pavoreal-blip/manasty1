@@ -290,6 +290,7 @@ export const OffersListPage: React.FC = () => {
           {offers.map((offer: any) => {
             const targetCategory = offer.category;
             const targetProduct = offer.product;
+            const displayImage = offer.imageUrl || targetProduct?.imageUrl || offer.merchant?.logoUrl;
 
             return (
               <div
@@ -299,16 +300,45 @@ export const OffersListPage: React.FC = () => {
                 }`}
               >
                 <div>
-                  <div className="bg-indigo-600 p-3.5 text-center text-white font-black text-base flex items-center justify-center gap-2">
-                    <span>🎉</span>
-                    <span>خصم خاص {offer.discountPercent}%</span>
-                  </div>
+                  {displayImage ? (
+                    <div className="relative w-full h-44 overflow-hidden border-b border-slate-200 dark:border-slate-800/80 bg-slate-900">
+                      <img
+                        src={displayImage}
+                        alt={offer.titleAr || offer.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30" />
+                      <div className="absolute top-3 right-3 px-3 py-1 rounded-xl bg-indigo-600/90 backdrop-blur-md text-white font-black text-xs shadow flex items-center gap-1.5 border border-indigo-400/30">
+                        <span>🎉</span>
+                        <span>خصم %{offer.discountPercent}</span>
+                      </div>
+                      {offer.merchant && (
+                        <div className="absolute bottom-3 right-3 left-3 flex items-center gap-2 text-white text-xs font-bold bg-slate-900/60 backdrop-blur-sm p-2 rounded-xl border border-white/10">
+                          {offer.merchant.logoUrl ? (
+                            <img src={offer.merchant.logoUrl} alt={offer.merchant.businessName} className="w-6 h-6 rounded-lg object-cover" />
+                          ) : (
+                            <Store size={16} className="text-indigo-400" />
+                          )}
+                          <span className="truncate">{offer.merchant?.businessNameAr || offer.merchant?.businessName}</span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="bg-indigo-600 p-3.5 text-center text-white font-black text-base flex items-center justify-center gap-2">
+                        <span>🎉</span>
+                        <span>خصم خاص {offer.discountPercent}%</span>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="p-5 space-y-3">
-                    <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold">
-                      <Store size={15} />
-                      <span>{offer.merchant?.businessNameAr || offer.merchant?.businessName || 'المتجر الشريك'}</span>
-                    </div>
+                    {!displayImage && (
+                      <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold">
+                        <Store size={15} />
+                        <span>{offer.merchant?.businessNameAr || offer.merchant?.businessName || 'المتجر الشريك'}</span>
+                      </div>
+                    )}
 
                     <h3 className={`text-base font-black ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
                       {offer.titleAr || offer.title}
