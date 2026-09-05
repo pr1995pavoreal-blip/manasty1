@@ -223,6 +223,16 @@ export const OffersListPage: React.FC = () => {
     }
   };
 
+  const handleDeleteOffer = async (offerId: string) => {
+    if (!window.confirm('هل أنت تأكد من رغبتك في حذف هذا العرض الترويجي؟')) return;
+    try {
+      await api.delete(`/offers/${offerId}`);
+      initData();
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'تعذر حذف العرض الترويجي');
+    }
+  };
+
   return (
     <div className="space-y-6 font-['Cairo',sans-serif]" dir="rtl">
       {/* Header & Breadcrumbs */}
@@ -312,6 +322,15 @@ export const OffersListPage: React.FC = () => {
                         <span>🎉</span>
                         <span>خصم %{offer.discountPercent}</span>
                       </div>
+                      {isMerchantOrAdmin && (
+                        <button
+                          onClick={() => handleDeleteOffer(offer.id)}
+                          className="absolute top-3 left-3 p-1.5 rounded-xl bg-red-600/80 hover:bg-red-600 text-white backdrop-blur-md transition shadow"
+                          title="حذف العرض"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
                       {offer.merchant && (
                         <div className="absolute bottom-3 right-3 left-3 flex items-center gap-2 text-white text-xs font-bold bg-slate-900/60 backdrop-blur-sm p-2 rounded-xl border border-white/10">
                           {offer.merchant.logoUrl ? (
@@ -325,9 +344,20 @@ export const OffersListPage: React.FC = () => {
                     </div>
                   ) : (
                     <div>
-                      <div className="bg-indigo-600 p-3.5 text-center text-white font-black text-base flex items-center justify-center gap-2">
-                        <span>🎉</span>
-                        <span>خصم خاص {offer.discountPercent}%</span>
+                      <div className="bg-indigo-600 p-3.5 text-center text-white font-black text-base flex items-center justify-between px-4">
+                        <div className="flex items-center gap-2">
+                          <span>🎉</span>
+                          <span>خصم خاص {offer.discountPercent}%</span>
+                        </div>
+                        {isMerchantOrAdmin && (
+                          <button
+                            onClick={() => handleDeleteOffer(offer.id)}
+                            className="p-1 rounded-lg bg-red-700/80 hover:bg-red-800 text-white transition"
+                            title="حذف العرض"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
                       </div>
                     </div>
                   )}

@@ -571,13 +571,20 @@ export const NearbyStoresPage: React.FC = () => {
                     return (
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                         {filtered.map((product: Product & { category?: any }) => {
+                          const matchingOffer = selectedBranch.merchant?.offers?.find(
+                            (o: any) =>
+                              o.productId === product.id ||
+                              (o.categoryId && o.categoryId === product.categoryId) ||
+                              (!o.productId && !o.categoryId)
+                          );
+                          const offerPercent = matchingOffer?.discountPercent || 0;
                           const firstDiscount = selectedBranch.merchant?.discounts?.[0];
-                          const discountVal = firstDiscount?.discountValue || 0;
-                          const hasDiscount = discountVal > 0;
+                          const ruleDiscountPercent = firstDiscount?.discountType === 'PERCENTAGE' ? (firstDiscount?.discountValue || 0) : 0;
+                          const bestDiscountPercent = Math.max(offerPercent, ruleDiscountPercent);
+                          
+                          const hasDiscount = bestDiscountPercent > 0;
                           const finalPrice = hasDiscount
-                            ? firstDiscount?.discountType === 'PERCENTAGE'
-                              ? product.price * (1 - discountVal / 100)
-                              : Math.max(0, product.price - discountVal)
+                            ? Math.round(product.price * (1 - bestDiscountPercent / 100))
                             : product.price;
 
                           return (
@@ -614,7 +621,7 @@ export const NearbyStoresPage: React.FC = () => {
                                   )}
                                   {hasDiscount && (
                                     <span className="absolute top-2 left-2 px-2 py-0.5 rounded-lg text-[9px] font-black bg-rose-500 text-white shadow">
-                                      مخصوم %{firstDiscount?.discountValue}
+                                      خصم %{bestDiscountPercent}
                                     </span>
                                   )}
                                 </div>
