@@ -83,11 +83,66 @@ export const NearbyStoresPage: React.FC = () => {
       if (categoryId && categoryId !== 'ALL') params.businessCategoryId = categoryId;
 
       const res = await api.get('/locations/nearby', { params });
-      setBranches(res.data.data || []);
+      const rawBranches: MerchantBranch[] = res.data.data || [];
+      setBranches(rawBranches);
+
+      const enrichedBranches = await Promise.all(
+        rawBranches.map(async (b) => {
+          if (b.merchantId && b.merchant && (!b.merchant.products || b.merchant.products.length === 0)) {
+            try {
+              const mRes = await api.get(`/merchants/${b.merchantId}`);
+              if (mRes.data?.data) {
+                return {
+                  ...b,
+                  merchant: {
+                    ...b.merchant,
+                    products: mRes.data.data.products || [],
+                    categories: mRes.data.data.categories || [],
+                    offers: mRes.data.data.offers || b.merchant.offers || [],
+                    discounts: mRes.data.data.discounts || b.merchant.discounts || [],
+                  },
+                } as MerchantBranch;
+              }
+            } catch (e) {
+              // ignore
+            }
+          }
+          return b;
+        })
+      );
+      setBranches(enrichedBranches);
     } catch (error) {
       console.error('Failed to fetch stores:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenBranchModal = async (branch: MerchantBranch, defaultTab: 'discounts' | 'products' = 'discounts') => {
+    setSelectedBranch(branch);
+    setActiveTab(defaultTab);
+    if (branch.merchantId && branch.merchant) {
+      try {
+        const res = await api.get(`/merchants/${branch.merchantId}`);
+        if (res.data?.data) {
+          const fullMerchant = res.data.data;
+          setSelectedBranch((prev) => {
+            if (!prev || !prev.merchant) return prev;
+            return {
+              ...prev,
+              merchant: {
+                ...prev.merchant,
+                products: fullMerchant.products || [],
+                categories: fullMerchant.categories || [],
+                offers: fullMerchant.offers || prev.merchant.offers || [],
+                discounts: fullMerchant.discounts || prev.merchant.discounts || [],
+              },
+            } as MerchantBranch;
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch full merchant details:', err);
+      }
     }
   };
 
@@ -263,10 +318,7 @@ export const NearbyStoresPage: React.FC = () => {
 
                 <div className="space-y-2.5 pt-2">
                   <button
-                    onClick={() => {
-                      setSelectedBranch(branch);
-                      setActiveTab('discounts');
-                    }}
+                    onClick={() => handleOpenBranchModal(branch, 'discounts')}
                     className={`w-full py-2.5 px-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition shadow-sm ${
                       isDark
                         ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/30'
