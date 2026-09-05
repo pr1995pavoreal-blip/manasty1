@@ -5,7 +5,8 @@ import { Merchant } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../context/ThemeContext';
 import { ImageUploadInput } from '../../components/ImageUploadInput';
-import { Store, Plus, MapPin, Package, Layers, CheckCircle2, RefreshCw, X, Sparkles, Edit2 } from 'lucide-react';
+import { LocationPickerModal } from '../../components/LocationPickerModal';
+import { Store, Plus, MapPin, Package, Layers, CheckCircle2, RefreshCw, X, Sparkles, Edit2, Compass, Navigation } from 'lucide-react';
 
 export const MerchantPortalPage: React.FC = () => {
   const { user } = useAuth();
@@ -21,6 +22,8 @@ export const MerchantPortalPage: React.FC = () => {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showProductModal, setShowProductModal] = useState(false);
   const [showEditStoreModal, setShowEditStoreModal] = useState(false);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+  const [locationTarget, setLocationTarget] = useState<'store' | 'branch'>('store');
 
   // Forms
   const [editStoreData, setEditStoreData] = useState({
@@ -30,6 +33,11 @@ export const MerchantPortalPage: React.FC = () => {
     commercialReg: '',
     description: '',
     logoUrl: '',
+    address: '',
+    city: 'الرياض',
+    latitude: 24.7136,
+    longitude: 46.6753,
+    googleMapsUrl: '',
   });
 
   const [branchData, setBranchData] = useState({
@@ -40,6 +48,7 @@ export const MerchantPortalPage: React.FC = () => {
     latitude: 24.7136,
     longitude: 46.6753,
     phone: '',
+    googleMapsUrl: '',
   });
 
   const [categoryData, setCategoryData] = useState({
@@ -80,6 +89,8 @@ export const MerchantPortalPage: React.FC = () => {
         const res = await api.get(`/merchants/${targetId}`);
         const m = res.data.data;
         setMerchant(m);
+        const mainBranch = m.branches && m.branches.length > 0 ? m.branches[0] : null;
+
         setEditStoreData({
           businessName: m.businessName || '',
           businessNameAr: m.businessNameAr || '',
@@ -87,6 +98,11 @@ export const MerchantPortalPage: React.FC = () => {
           commercialReg: m.commercialReg || '',
           description: m.description || '',
           logoUrl: m.logoUrl || '',
+          address: mainBranch?.address || '',
+          city: mainBranch?.city || 'الرياض',
+          latitude: mainBranch?.latitude || 24.7136,
+          longitude: mainBranch?.longitude || 46.6753,
+          googleMapsUrl: mainBranch?.googleMapsUrl || '',
         });
       }
     } catch (error) {
@@ -105,7 +121,7 @@ export const MerchantPortalPage: React.FC = () => {
       setShowEditStoreModal(false);
       fetchMerchantDetails();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'تعذر تحديث بيانات المتجر');
+      alert(error.response?.data?.message || 'تعذر تحديث بيانات المتجر والموقع');
     }
   };
 
@@ -333,11 +349,24 @@ export const MerchantPortalPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold mb-1">العنوان والشارع</label>
+                <label className="block text-xs font-bold mb-1">المدينة والحي</label>
                 <input
                   type="text"
                   required
-                  placeholder="طريق الملك فهد"
+                  placeholder="الجبيل - حي الحمراء"
+                  value={branchData.city}
+                  onChange={(e) => setBranchData({ ...branchData, city: e.target.value })}
+                  className={`w-full h-10 px-3 rounded-xl border text-xs font-semibold outline-none ${
+                    isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-[#0F172A]'
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold mb-1">العنوان والشارع التفصيلي</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="شارع الملك فيصل"
                   value={branchData.address}
                   onChange={(e) => setBranchData({ ...branchData, address: e.target.value })}
                   className={`w-full h-10 px-3 rounded-xl border text-xs font-semibold outline-none ${
@@ -345,6 +374,31 @@ export const MerchantPortalPage: React.FC = () => {
                   }`}
                 />
               </div>
+
+              {/* Map Location Section */}
+              <div className={`p-3 rounded-xl border space-y-2 ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold flex items-center gap-1.5 text-indigo-500">
+                    <MapPin size={15} />
+                    <span>موقع الفرع على الخريطة الإحداثيات:</span>
+                  </span>
+                  <span className="text-[11px] font-mono font-bold text-slate-400">
+                    {branchData.latitude.toFixed(4)}, {branchData.longitude.toFixed(4)}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLocationTarget('branch');
+                    setIsLocationModalOpen(true);
+                  }}
+                  className="w-full py-2 rounded-xl bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 text-xs font-bold flex items-center justify-center gap-2 transition"
+                >
+                  <Compass size={15} />
+                  <span>تحديد / تغيير الموقع على الخريطة التفاعلية 🗺️</span>
+                </button>
+              </div>
+
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-700/50">
                 <button type="button" onClick={() => setShowBranchModal(false)} className="px-4 py-2 rounded-xl border text-xs font-bold text-slate-400">
                   إلغاء
@@ -378,9 +432,21 @@ export const MerchantPortalPage: React.FC = () => {
                 <input
                   type="text"
                   required
-                  placeholder="سبانيش لاتيه"
+                  placeholder="عباية سوداء فاخرة"
                   value={productData.nameAr}
                   onChange={(e) => setProductData({ ...productData, nameAr: e.target.value, name: e.target.value })}
+                  className={`w-full h-10 px-3 rounded-xl border text-xs font-semibold outline-none ${
+                    isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-[#0F172A]'
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold mb-1">الوصف</label>
+                <input
+                  type="text"
+                  placeholder="وصف مختصر للعباية أو الخدمة"
+                  value={productData.description}
+                  onChange={(e) => setProductData({ ...productData, description: e.target.value })}
                   className={`w-full h-10 px-3 rounded-xl border text-xs font-semibold outline-none ${
                     isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-[#0F172A]'
                   }`}
@@ -422,18 +488,18 @@ export const MerchantPortalPage: React.FC = () => {
         </div>
       )}
 
-      {/* Edit Store Profile & Logo Modal */}
+      {/* Edit Store Profile, Logo & Map Location Modal */}
       {showEditStoreModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn" dir="rtl">
           <div
-            className={`w-full max-w-lg rounded-2xl border shadow-2xl overflow-hidden ${
+            className={`w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border shadow-2xl ${
               isDark ? 'bg-[#0F172A] border-slate-800 text-white' : 'bg-white border-slate-200 text-[#0F172A]'
             }`}
           >
-            <div className="flex items-center justify-between p-4 border-b border-slate-700/50">
+            <div className="sticky top-0 z-20 flex items-center justify-between p-4 border-b border-slate-700/50 bg-inherit">
               <h3 className="text-sm font-black flex items-center gap-2">
                 <Edit2 size={16} className="text-indigo-500" />
-                <span>تعديل بيانات المتجر وشعار اللوجو</span>
+                <span>تعديل بيانات المتجر، الشعار وموقع الخريطة</span>
               </h3>
               <button onClick={() => setShowEditStoreModal(false)} className="p-1 text-slate-400 hover:text-white">
                 <X size={18} />
@@ -468,17 +534,69 @@ export const MerchantPortalPage: React.FC = () => {
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold mb-1">المدينة</label>
+                  <input
+                    type="text"
+                    value={editStoreData.city}
+                    onChange={(e) => setEditStoreData({ ...editStoreData, city: e.target.value })}
+                    placeholder="الجبيل"
+                    className={`w-full h-10 px-3 rounded-xl border text-xs font-semibold outline-none ${
+                      isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-[#0F172A]'
+                    }`}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold mb-1">العنوان والحي التفصيلي</label>
+                  <input
+                    type="text"
+                    value={editStoreData.address}
+                    onChange={(e) => setEditStoreData({ ...editStoreData, address: e.target.value })}
+                    placeholder="حي الحمراء، شارع الملك فيصل"
+                    className={`w-full h-10 px-3 rounded-xl border text-xs font-semibold outline-none ${
+                      isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-[#0F172A]'
+                    }`}
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-bold mb-1">فئة النشاط التجاري</label>
                 <input
                   type="text"
                   value={editStoreData.categoryName}
                   onChange={(e) => setEditStoreData({ ...editStoreData, categoryName: e.target.value })}
-                  placeholder="كافيهات ومطاعم"
+                  placeholder="أزياء وعبايات وتفصيل"
                   className={`w-full h-10 px-3 rounded-xl border text-xs font-semibold outline-none ${
                     isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-[#0F172A]'
                   }`}
                 />
+              </div>
+
+              {/* Interactive Map Location Section */}
+              <div className={`p-4 rounded-2xl border space-y-2.5 ${isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold flex items-center gap-1.5 text-indigo-500">
+                    <MapPin size={16} />
+                    <span>موقع المتجر على الخريطة والإحداثيات:</span>
+                  </span>
+                  <span className="text-xs font-mono font-extrabold text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-lg border border-indigo-500/20">
+                    {editStoreData.latitude.toFixed(4)}, {editStoreData.longitude.toFixed(4)}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLocationTarget('store');
+                    setIsLocationModalOpen(true);
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center justify-center gap-2 transition shadow-md shadow-indigo-600/25"
+                >
+                  <Compass size={16} />
+                  <span>تحديد / تغيير موقع الخريطة التفاعلية 🗺️</span>
+                </button>
               </div>
 
               <div>
@@ -495,13 +613,45 @@ export const MerchantPortalPage: React.FC = () => {
                   إلغاء
                 </button>
                 <button type="submit" className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-md">
-                  حفظ التعديلات
+                  حفظ التعديلات والموقع
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* Interactive Location Picker Modal */}
+      <LocationPickerModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+        initialLat={locationTarget === 'store' ? editStoreData.latitude : branchData.latitude}
+        initialLng={locationTarget === 'store' ? editStoreData.longitude : branchData.longitude}
+        initialCity={locationTarget === 'store' ? editStoreData.city : branchData.city}
+        initialAddress={locationTarget === 'store' ? editStoreData.address : branchData.address}
+        initialMapsUrl={locationTarget === 'store' ? editStoreData.googleMapsUrl : branchData.googleMapsUrl}
+        onSelectLocation={(data) => {
+          if (locationTarget === 'store') {
+            setEditStoreData((prev) => ({
+              ...prev,
+              latitude: data.latitude,
+              longitude: data.longitude,
+              city: data.city,
+              address: data.address,
+              googleMapsUrl: data.googleMapsUrl,
+            }));
+          } else {
+            setBranchData((prev) => ({
+              ...prev,
+              latitude: data.latitude,
+              longitude: data.longitude,
+              city: data.city,
+              address: data.address,
+              googleMapsUrl: data.googleMapsUrl,
+            }));
+          }
+        }}
+      />
     </div>
   );
 };
