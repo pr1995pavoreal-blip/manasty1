@@ -56,6 +56,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenScanner }) =
 
   const roles = user?.roles || [];
   const isCustomerOnly = roles.includes('CUSTOMER') && !roles.includes('ADMIN') && !roles.includes('SUPER_ADMIN') && !roles.includes('MERCHANT_OWNER') && !roles.includes('MERCHANT_EMPLOYEE');
+  const isMerchantRole = (roles.includes('MERCHANT_OWNER') || roles.includes('MERCHANT_EMPLOYEE')) && !roles.includes('SUPER_ADMIN') && !roles.includes('ADMIN');
 
   if (isCustomerOnly) {
     return (
@@ -219,8 +220,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenScanner }) =
         </div>
       </div>
 
-      {/* 5 Top Summary Metric Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
+      {/* Top Summary Metric Cards */}
+      <div className={`grid gap-3 sm:gap-4 ${isMerchantRole ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5'}`}>
         {/* Card 1: العمليات اليوم */}
         <div
           className={`p-5 rounded-2xl border transition-all duration-200 hover:-translate-y-1 shadow-sm ${
@@ -284,47 +285,52 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onOpenScanner }) =
           </div>
         </div>
 
-        {/* Card 4: إجمالي المتاجر */}
-        <div
-          className={`p-5 rounded-2xl border transition-all duration-200 hover:-translate-y-1 shadow-sm ${
-            isDark ? 'bg-[#0B0F19] border-slate-800/80' : 'bg-white border-slate-200'
-          }`}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">إجمالي المتاجر</span>
-            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
-              <Store size={18} />
+        {/* Cards 4 & 5: Only visible to Super Admin / Admin (Hidden for Store Owners) */}
+        {!isMerchantRole && (
+          <>
+            {/* Card 4: إجمالي المتاجر */}
+            <div
+              className={`p-5 rounded-2xl border transition-all duration-200 hover:-translate-y-1 shadow-sm ${
+                isDark ? 'bg-[#0B0F19] border-slate-800/80' : 'bg-white border-slate-200'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold text-slate-400">إجمالي المتاجر</span>
+                <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+                  <Store size={18} />
+                </div>
+              </div>
+              <div className={`text-2xl font-black mb-1.5 ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
+                {loading ? '...' : totalMerchants.toLocaleString()}
+              </div>
+              <div className="flex items-center gap-1 text-[11px] text-emerald-500 font-bold">
+                <ArrowUpLeft size={14} />
+                <span>التجار المسجلون</span>
+              </div>
             </div>
-          </div>
-          <div className={`text-2xl font-black mb-1.5 ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
-            {loading ? '...' : totalMerchants.toLocaleString()}
-          </div>
-          <div className="flex items-center gap-1 text-[11px] text-emerald-500 font-bold">
-            <ArrowUpLeft size={14} />
-            <span>التجار المسجلون</span>
-          </div>
-        </div>
 
-        {/* Card 5: إجمالي العملاء */}
-        <div
-          className={`p-5 rounded-2xl border transition-all duration-200 hover:-translate-y-1 shadow-sm ${
-            isDark ? 'bg-[#0B0F19] border-slate-800/80' : 'bg-white border-slate-200'
-          }`}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-400">إجمالي العملاء</span>
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
-              <Users size={18} />
+            {/* Card 5: إجمالي العملاء */}
+            <div
+              className={`p-5 rounded-2xl border transition-all duration-200 hover:-translate-y-1 shadow-sm ${
+                isDark ? 'bg-[#0B0F19] border-slate-800/80' : 'bg-white border-slate-200'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold text-slate-400">إجمالي العملاء</span>
+                <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
+                  <Users size={18} />
+                </div>
+              </div>
+              <div className={`text-2xl font-black mb-1.5 ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
+                {loading ? '...' : totalCustomers.toLocaleString()}
+              </div>
+              <div className="flex items-center gap-1 text-[11px] text-emerald-500 font-bold">
+                <ArrowUpLeft size={14} />
+                <span>العملاء المسجلون</span>
+              </div>
             </div>
-          </div>
-          <div className={`text-2xl font-black mb-1.5 ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
-            {loading ? '...' : totalCustomers.toLocaleString()}
-          </div>
-          <div className="flex items-center gap-1 text-[11px] text-emerald-500 font-bold">
-            <ArrowUpLeft size={14} />
-            <span>العملاء المسجلون</span>
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       {/* Middle Charts Section (Transactions Line Area Chart & Discounts Donut Breakdown) */}
