@@ -146,7 +146,7 @@ export const AdminReportsPage: React.FC = () => {
             <tbody className="divide-y divide-slate-800/40">
               <tr className="hover:bg-slate-500/5 transition">
                 <td className={`py-4 px-4 font-bold ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>إجمالي العملاء المسجلين</td>
-                <td className="py-4 px-4 font-mono font-bold text-indigo-400 text-sm">{stats?.totalCustomers || 1248}</td>
+                <td className="py-4 px-4 font-mono font-bold text-indigo-400 text-sm">{(stats?.totalCustomers ?? 0).toLocaleString()}</td>
                 <td className="py-4 px-4 text-left">
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                     <CheckCircle2 size={12} />
@@ -157,7 +157,7 @@ export const AdminReportsPage: React.FC = () => {
 
               <tr className="hover:bg-slate-500/5 transition">
                 <td className={`py-4 px-4 font-bold ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>إجمالي التجار والمتاجر الشريكة</td>
-                <td className="py-4 px-4 font-mono font-bold text-indigo-400 text-sm">{stats?.totalMerchants || 847}</td>
+                <td className="py-4 px-4 font-mono font-bold text-indigo-400 text-sm">{(stats?.totalMerchants ?? 0).toLocaleString()}</td>
                 <td className="py-4 px-4 text-left">
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                     <CheckCircle2 size={12} />
@@ -168,7 +168,7 @@ export const AdminReportsPage: React.FC = () => {
 
               <tr className="hover:bg-slate-500/5 transition">
                 <td className={`py-4 px-4 font-bold ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>إجمالي بطاقات العضوية المصدرة</td>
-                <td className="py-4 px-4 font-mono font-bold text-indigo-400 text-sm">{stats?.activeCards || 1190}</td>
+                <td className="py-4 px-4 font-mono font-bold text-indigo-400 text-sm">{(stats?.activeCards ?? 0).toLocaleString()}</td>
                 <td className="py-4 px-4 text-left">
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                     <CheckCircle2 size={12} />
@@ -179,7 +179,7 @@ export const AdminReportsPage: React.FC = () => {
 
               <tr className="hover:bg-slate-500/5 transition">
                 <td className={`py-4 px-4 font-bold ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>إجمالي المعاملات والخصومات المنفذة</td>
-                <td className="py-4 px-4 font-mono font-bold text-indigo-400 text-sm">{stats?.totalTransactions || 4890}</td>
+                <td className="py-4 px-4 font-mono font-bold text-indigo-400 text-sm">{(stats?.totalTransactions ?? 0).toLocaleString()}</td>
                 <td className="py-4 px-4 text-left">
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                     <CheckCircle2 size={12} />
