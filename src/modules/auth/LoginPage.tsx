@@ -3,7 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { api } from '../../services/api';
-import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle, CheckCircle2, ChevronDown, ChevronUp, Sparkles, User, Shield, Store, Building2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle, CheckCircle2, ChevronDown, ChevronUp, Sparkles, User, Shield, Store, Building2, KeyRound } from 'lucide-react';
+import { ResetPasswordModal } from '../../components/ResetPasswordModal';
 
 export const LoginPage: React.FC = () => {
   const { t } = useTranslation();
@@ -18,6 +19,7 @@ export const LoginPage: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [showDemoAccounts, setShowDemoAccounts] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -323,16 +325,13 @@ export const LoginPage: React.FC = () => {
                     <span className="font-semibold">تذكرني</span>
                   </label>
 
-                  <a 
-                    href="#forgot-password"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      alert('يمكنك التواصل مع الدعم الفني لإعادة تعيين كلمة المرور، أو استخدام حسابات التجربة السريعة أعلاه.');
-                    }}
-                    className="text-[#6366F1] hover:text-indigo-700 font-bold transition-colors hover:underline"
+                  <button 
+                    type="button"
+                    onClick={() => setShowResetModal(true)}
+                    className="text-[#6366F1] hover:text-indigo-700 font-bold transition-colors hover:underline bg-transparent border-0 cursor-pointer"
                   >
                     نسيت كلمة المرور؟
-                  </a>
+                  </button>
                 </div>
 
                 {/* Primary Action Button */}
@@ -494,6 +493,16 @@ export const LoginPage: React.FC = () => {
       <footer className="text-center py-3 text-[11px] text-slate-400 bg-slate-100/50 border-t border-slate-200/60">
         جميع الحقوق محفوظة © {new Date().getFullYear()} منصتي - منصة العضويات والخصومات الموحدة
       </footer>
+
+      <ResetPasswordModal
+        isOpen={showResetModal}
+        onClose={() => setShowResetModal(false)}
+        onSuccessPrefill={(id, pass) => {
+          setLoginIdentifier(id);
+          setPassword(pass);
+          setSuccessMsg('تم تعيين كلمة المرور الجديدة بنجاح! يمكنك الآن تسجيل الدخول');
+        }}
+      />
     </div>
   );
 };

@@ -28,8 +28,11 @@ import {
   QrCode,
   Award,
   Package,
+  Sparkles,
+  Key,
   Layers,
 } from 'lucide-react';
+import { ChangePasswordModal } from './ChangePasswordModal';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -49,6 +52,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onOpenScanne
     return false;
   });
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
   // Close sidebar on mobile when navigating pages
   useEffect(() => {
@@ -224,6 +228,17 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onOpenScanne
                   <p className="text-xs font-bold m-0 truncate">{user.fullName}</p>
                   <p className="text-[10px] text-slate-400 font-mono m-0 truncate">{user.email}</p>
                 </div>
+                <button
+                  onClick={() => {
+                    setUserDropdownOpen(false);
+                    setShowChangePasswordModal(true);
+                  }}
+                  className="w-full mt-1 text-indigo-400 hover:bg-indigo-500/10 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition"
+                >
+                  <Key size={14} />
+                  <span>تغيير كلمة المرور</span>
+                </button>
+
                 <button
                   onClick={handleLogout}
                   className="w-full mt-1 text-red-500 hover:bg-red-500/10 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition"
@@ -592,13 +607,23 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onOpenScanne
                 </div>
               </div>
 
-              <button
-                onClick={handleLogout}
-                className="w-full text-red-500 hover:bg-red-500/10 py-1.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition border border-red-500/20"
-              >
-                <LogOut size={14} />
-                <span>تسجيل الخروج</span>
-              </button>
+              <div className="space-y-1.5 mt-2">
+                <button
+                  onClick={() => setShowChangePasswordModal(true)}
+                  className="w-full text-indigo-400 hover:bg-indigo-500/10 py-1.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition border border-indigo-500/20"
+                >
+                  <Key size={14} />
+                  <span>تغيير كلمة المرور</span>
+                </button>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-red-500 hover:bg-red-500/10 py-1.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition border border-red-500/20"
+                >
+                  <LogOut size={14} />
+                  <span>تسجيل الخروج</span>
+                </button>
+              </div>
             </div>
           )}
         </aside>
@@ -612,6 +637,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, onOpenScanne
           <div className="max-w-7xl mx-auto w-full">{children}</div>
         </main>
       </div>
+
+      <ChangePasswordModal
+        isOpen={showChangePasswordModal}
+        onClose={() => setShowChangePasswordModal(false)}
+      />
     </div>
   );
 };
