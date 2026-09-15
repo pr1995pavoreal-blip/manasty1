@@ -59,21 +59,12 @@ export const ProductsPage: React.FC = () => {
   const fetchMerchantCatalog = async () => {
     try {
       setLoading(true);
-      let targetId = user?.merchantId;
-
-      if (!targetId) {
-        const resList = await api.get('/merchants');
-        const merchants = resList.data.data.merchants;
-        if (merchants && merchants.length > 0) {
-          targetId = merchants[0].id;
-        }
-      }
-
-      if (targetId) {
-        setMerchantId(targetId);
-        const res = await api.get(`/merchants/${targetId}`);
-        setProducts(res.data.data.products || []);
-        setCategories(res.data.data.categories || []);
+      const res = await api.get('/merchants/my-store');
+      if (res.data?.data) {
+        const m = res.data.data;
+        setMerchantId(m.id);
+        setProducts(m.products || []);
+        setCategories(m.categories || []);
       }
     } catch (error) {
       console.error('Failed to load merchant catalog:', error);

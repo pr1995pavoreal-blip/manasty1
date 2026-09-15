@@ -73,21 +73,19 @@ export const MerchantPortalPage: React.FC = () => {
   const fetchMerchantDetails = async () => {
     try {
       setLoading(true);
-      // Strictly scope to logged-in merchant's own store ID if available
-      let targetId = user?.merchantId || urlMerchantId;
+      let m = null;
 
-      if (!targetId) {
-        const resList = await api.get('/merchants');
-        const merchants = resList.data.data.merchants;
-        if (merchants && merchants.length > 0) {
-          targetId = merchants[0].id;
-        }
+      if (urlMerchantId) {
+        setMerchantId(urlMerchantId);
+        const res = await api.get(`/merchants/${urlMerchantId}`);
+        m = res.data.data;
+      } else {
+        const res = await api.get('/merchants/my-store');
+        m = res.data.data;
+        if (m) setMerchantId(m.id);
       }
 
-      if (targetId) {
-        setMerchantId(targetId);
-        const res = await api.get(`/merchants/${targetId}`);
-        const m = res.data.data;
+      if (m) {
         setMerchant(m);
         const mainBranch = m.branches && m.branches.length > 0 ? m.branches[0] : null;
 
