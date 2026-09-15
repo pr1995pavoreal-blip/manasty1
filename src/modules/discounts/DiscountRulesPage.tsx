@@ -1,17 +1,25 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { api } from '../../services/api';
-import { DiscountRule, Product, Category } from '../../types';
+import { DiscountRule, Product, Category, MembershipType } from '../../types';
 import { Percent, Plus, Package, Search } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../context/ThemeContext';
+import { fetchUserMerchantStore } from '../../utils/merchantHelper';
 
 export const DiscountRulesPage: React.FC = () => {
   const { user } = useAuth();
+  const { isDark } = useTheme();
+
   const [rules, setRules] = useState<DiscountRule[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [memberships, setMemberships] = useState<MembershipType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
   const [merchantId, setMerchantId] = useState<string | undefined>(user?.merchantId);
+
+  // Modals & Form
+  const [showModal, setShowModal] = useState(false);
+  const [editingRule, setEditingRule] = useState<DiscountRule | null>(null);
 
   // Search & Filter state for Smart Product Picker
   const [productSearch, setProductSearch] = useState('');
@@ -21,12 +29,13 @@ export const DiscountRulesPage: React.FC = () => {
     title: '',
     titleAr: '',
     discountType: 'PERCENTAGE',
-    discountValue: 20,
-    minPurchaseAmount: 50,
-    maxDiscountAmount: 100,
-    usageLimit: 1000,
+    discountValue: 10,
+    minPurchaseAmount: 0,
+    maxDiscountAmount: undefined as number | undefined,
+    usageLimit: undefined as number | undefined,
     categoryId: '',
     productId: '',
+    membershipTypeId: '',
   });
 
   useEffect(() => {
@@ -39,11 +48,8 @@ export const DiscountRulesPage: React.FC = () => {
       let targetMerchantId = user?.merchantId;
 
       if (!targetMerchantId) {
-        const res = await api.get('/merchants');
-        const merchants = res.data.data.merchants;
-        if (merchants && merchants.length > 0) {
-          targetMerchantId = merchants[0].id;
-        }
+        const m = await fetchUserMerchantStore(user);
+        if (m) targetMerchantId = m.id;
       }
 
       if (targetMerchantId) {

@@ -19,6 +19,8 @@ import {
   DollarSign,
 } from 'lucide-react';
 
+import { fetchUserMerchantStore } from '../../utils/merchantHelper';
+
 export const ProductsPage: React.FC = () => {
   const { user } = useAuth();
   const { isDark } = useTheme();
@@ -42,7 +44,7 @@ export const ProductsPage: React.FC = () => {
     name: '',
     nameAr: '',
     description: '',
-    price: 25,
+    price: 0,
     categoryId: '',
     imageUrl: '',
   });
@@ -59,9 +61,8 @@ export const ProductsPage: React.FC = () => {
   const fetchMerchantCatalog = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/merchants/my-store');
-      if (res.data?.data) {
-        const m = res.data.data;
+      const m = await fetchUserMerchantStore(user);
+      if (m) {
         setMerchantId(m.id);
         setProducts(m.products || []);
         setCategories(m.categories || []);

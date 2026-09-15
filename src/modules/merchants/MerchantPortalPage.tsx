@@ -8,6 +8,8 @@ import { ImageUploadInput } from '../../components/ImageUploadInput';
 import { LocationPickerModal } from '../../components/LocationPickerModal';
 import { Store, Plus, MapPin, Package, Layers, CheckCircle2, RefreshCw, X, Sparkles, Edit2, Compass, Navigation } from 'lucide-react';
 
+import { fetchUserMerchantStore } from '../../utils/merchantHelper';
+
 export const MerchantPortalPage: React.FC = () => {
   const { user } = useAuth();
   const { isDark } = useTheme();
@@ -73,20 +75,11 @@ export const MerchantPortalPage: React.FC = () => {
   const fetchMerchantDetails = async () => {
     try {
       setLoading(true);
-      let m = null;
-
-      if (urlMerchantId) {
-        setMerchantId(urlMerchantId);
-        const res = await api.get(`/merchants/${urlMerchantId}`);
-        m = res.data.data;
-      } else {
-        const res = await api.get('/merchants/my-store');
-        m = res.data.data;
-        if (m) setMerchantId(m.id);
-      }
+      const m = await fetchUserMerchantStore(user, urlMerchantId);
 
       if (m) {
         setMerchant(m);
+        setMerchantId(m.id);
         const mainBranch = m.branches && m.branches.length > 0 ? m.branches[0] : null;
 
         setEditStoreData({

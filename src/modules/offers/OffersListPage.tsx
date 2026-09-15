@@ -4,6 +4,7 @@ import { Offer, MembershipType, Product, Category } from '../../types';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 import { ImageUploadInput } from '../../components/ImageUploadInput';
+import { fetchUserMerchantStore } from '../../utils/merchantHelper';
 import {
   Tag,
   Calendar,
@@ -58,10 +59,10 @@ export const OffersListPage: React.FC = () => {
     title: '',
     titleAr: '',
     description: '',
-    imageUrl: '',
     discountPercent: 15,
     startDateTime: nowStr,
     endDateTime: in30DaysStr,
+    imageUrl: '',
     membershipTypeIds: [] as string[],
   });
 
@@ -74,10 +75,8 @@ export const OffersListPage: React.FC = () => {
       setLoading(true);
       let targetMerchantId = user?.merchantId;
       if (!targetMerchantId && isMerchantOrAdmin) {
-        const merchRes = await api.get('/merchants');
-        if (merchRes.data.data.merchants?.length > 0) {
-          targetMerchantId = merchRes.data.data.merchants[0].id;
-        }
+        const m = await fetchUserMerchantStore(user);
+        if (m) targetMerchantId = m.id;
       }
 
       setMerchantId(targetMerchantId);
@@ -92,15 +91,12 @@ export const OffersListPage: React.FC = () => {
 
       if (targetMerchantId) {
         const merchDetails = await api.get(`/merchants/${targetMerchantId}`);
-        if (merchDetails.data.data.products) {
+        if (merchDetails.data?.data?.products) {
           setProducts(merchDetails.data.data.products);
-        }
-        if (merchDetails.data.data.categories) {
-          setCategories(merchDetails.data.data.categories);
         }
       }
     } catch (error) {
-      console.error('Failed to load offers data:', error);
+      console.error('Failed to initialize offers data:', error);
     } finally {
       setLoading(false);
     }
