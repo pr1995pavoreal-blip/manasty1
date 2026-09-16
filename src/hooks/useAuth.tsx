@@ -1,5 +1,6 @@
-import React, { useState, createContext, useContext, ReactNode } from 'react';
+import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User } from '../types';
+import { api } from '../services/api';
 
 interface AuthContextType {
   user: User | null;
@@ -18,6 +19,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (token) {
+      api
+        .get('/auth/profile')
+        .then((res: any) => {
+          if (res.data?.user) {
+            const u = res.data.user;
+            const updatedUser: User = {
+              id: u.userId || u.id || user?.id || '',
+              email: u.email || user?.email || '',
+              fullName: user?.fullName || u.email || '',
+              phone: user?.phone,
+              avatarUrl: user?.avatarUrl,
+              roles: u.roles || user?.roles || [],
+              merchantId: u.merchantId || user?.merchantId,
+            };
+            setUser((prev) => ({ ...prev, ...updatedUser }));
+            localStorage.setItem('user', JSON.stringify({ ...user, ...updatedUser }));
+          }
+        })
+        .catch((err: any) => {
+          console.error('Session sync error:', err);
+        });
+    }
+  }, [token]);
 
   const login = (data: { user: User; accessToken: string; refreshToken: string }) => {
     setUser(data.user);
