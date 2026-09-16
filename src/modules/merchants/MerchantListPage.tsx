@@ -50,7 +50,10 @@ export const MerchantListPage: React.FC = () => {
   // Modal States
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedMerchant, setSelectedMerchant] = useState<Merchant | null>(null);
+  const [merchantToDelete, setMerchantToDelete] = useState<Merchant | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Form State for Create/Edit
   const [formData, setFormData] = useState({
@@ -210,6 +213,24 @@ export const MerchantListPage: React.FC = () => {
       alert(error.response?.data?.message || 'فشل تعديل المتجر');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // Delete Merchant Submit
+  const handleDeleteMerchant = async () => {
+    if (!merchantToDelete) return;
+    try {
+      setDeleting(true);
+      await api.delete(`/merchants/${merchantToDelete.id}`);
+      setIsDeleteModalOpen(false);
+      setActionSuccess(`تم حذف المتجر "${merchantToDelete.businessNameAr || merchantToDelete.businessName}" بنجاح!`);
+      setMerchantToDelete(null);
+      setTimeout(() => setActionSuccess(''), 3000);
+      fetchMerchants();
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'فشل حذف المتجر');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -507,7 +528,7 @@ export const MerchantListPage: React.FC = () => {
                     </div>
                   )}
 
-                  {isAdmin && currentStatus !== 'PENDING' && (
+                  {isAdmin && (
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleUpdateStatus(m.id, currentStatus === 'APPROVED' ? 'SUSPENDED' : 'APPROVED')}
@@ -532,11 +553,23 @@ export const MerchantListPage: React.FC = () => {
 
                       <button
                         onClick={() => handleOpenEditModal(m)}
-                        className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-indigo-600 hover:text-white transition text-xs font-bold flex items-center gap-1"
+                        className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-indigo-600 hover:text-white transition text-xs font-bold flex items-center gap-1 cursor-pointer"
                         title="تعديل بيانات المتجر"
                       >
                         <Edit size={14} />
                         <span>تعديل</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setMerchantToDelete(m);
+                          setIsDeleteModalOpen(true);
+                        }}
+                        className="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-600 border border-red-500/20 text-red-600 dark:text-red-400 hover:text-white transition text-xs font-bold flex items-center gap-1 cursor-pointer"
+                        title="حذف المتجر نهائياً"
+                      >
+                        <Trash2 size={14} />
+                        <span>حذف</span>
                       </button>
                     </div>
                   )}
@@ -860,6 +893,45 @@ export const MerchantListPage: React.FC = () => {
           }));
         }}
       />
+      {/* DELETE CONFIRMATION MODAL */}
+      {isDeleteModalOpen && merchantToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn font-['Cairo',sans-serif]" dir="rtl">
+          <div className="bg-white dark:bg-[#0B0F19] text-[#0F172A] dark:text-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden p-6 text-center space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-red-500/10 text-red-500 flex items-center justify-center mx-auto">
+              <Trash2 size={32} />
+            </div>
+            <div>
+              <h3 className="text-lg font-black">تأكيد حذف المتجر</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                هل أنت تأكيد من رغبتك في حذف المتجر <strong className="text-red-500 font-extrabold">{merchantToDelete.businessNameAr || merchantToDelete.businessName}</strong>؟
+                <br />
+                <span className="text-[11px] text-slate-400">سيتم حذف هذا المتجر وجميع بياناته وفروعه وعروضه بشكل نهائي.</span>
+              </p>
+            </div>
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setMerchantToDelete(null);
+                }}
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                إلغاء
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteMerchant}
+                disabled={deleting}
+                className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-red-500/25 transition cursor-pointer disabled:opacity-50"
+              >
+                {deleting ? <RefreshCw size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                <span>تأكيد الحذف</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
