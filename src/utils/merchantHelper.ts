@@ -33,21 +33,27 @@ export async function fetchUserMerchantStore(
     }
   }
 
-  // 3. Strict lookup: Fetch merchants and filter strictly by user.id or user.email
+  // 3. Strict lookup: Fetch merchants list and filter strictly by user.id or user.email
   try {
     const resList = await api.get('/merchants');
     const merchants: Merchant[] = resList.data?.data?.merchants || resList.data?.data || [];
     if (Array.isArray(merchants)) {
-      const matched = merchants.find(
-        (m: any) =>
-          (user?.id && m.ownerId === user.id) ||
-          (user?.id && m.owner?.id === user.id) ||
-          (user?.email && m.owner?.email === user.email)
-      );
+      const matched = merchants.find((m: any) => {
+        const matchId = user?.id && (m.ownerId === user.id || m.owner?.id === user.id);
+        const matchEmail =
+          user?.email &&
+          m.owner?.email &&
+          m.owner.email.trim().toLowerCase() === user.email.trim().toLowerCase();
+        return matchId || matchEmail;
+      });
+
       if (matched) {
-        // Fetch full merchant details with products, branches, categories
-        const resDetail = await api.get(`/merchants/${matched.id}`);
-        if (resDetail.data?.data) return resDetail.data.data;
+        try {
+          const resDetail = await api.get(`/merchants/${matched.id}`);
+          if (resDetail.data?.data) return resDetail.data.data;
+        } catch (e) {
+          // Ignore
+        }
         return matched;
       }
     }
