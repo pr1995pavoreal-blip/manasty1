@@ -437,34 +437,49 @@ export const MerchantListPage: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Status Badge Rendering */}
-                    {currentStatus === 'APPROVED' && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                        <CheckCircle2 size={12} />
-                        <span>متجر معتمد</span>
-                      </span>
-                    )}
+                    {/* Status Badge & Delete Icon */}
+                    <div className="flex items-center gap-1.5">
+                      {currentStatus === 'APPROVED' && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                          <CheckCircle2 size={12} />
+                          <span>متجر معتمد</span>
+                        </span>
+                      )}
 
-                    {currentStatus === 'PENDING' && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 animate-pulse">
-                        <Clock size={12} />
-                        <span>بانتظار الموافقة</span>
-                      </span>
-                    )}
+                      {currentStatus === 'PENDING' && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 animate-pulse">
+                          <Clock size={12} />
+                          <span>بانتظار الموافقة</span>
+                        </span>
+                      )}
 
-                    {currentStatus === 'SUSPENDED' && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30">
-                        <PauseCircle size={12} />
-                        <span>متجر متوقف</span>
-                      </span>
-                    )}
+                      {currentStatus === 'SUSPENDED' && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30">
+                          <PauseCircle size={12} />
+                          <span>متجر متوقف</span>
+                        </span>
+                      )}
 
-                    {currentStatus === 'REJECTED' && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-slate-500/15 text-slate-500 border border-slate-500/30">
-                        <XCircle size={12} />
-                        <span>طلب مرفوض</span>
-                      </span>
-                    )}
+                      {currentStatus === 'REJECTED' && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-slate-500/15 text-slate-500 border border-slate-500/30">
+                          <XCircle size={12} />
+                          <span>طلب مرفوض</span>
+                        </span>
+                      )}
+
+                      {isAdmin && (
+                        <button
+                          onClick={() => {
+                            setMerchantToDelete(m);
+                            setIsDeleteModalOpen(true);
+                          }}
+                          className="p-1.5 rounded-xl bg-red-500/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-500/20 transition-all duration-150 cursor-pointer"
+                          title="حذف المتجر نهائياً"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <h3 className={`text-base font-black mb-1 ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
@@ -530,34 +545,35 @@ export const MerchantListPage: React.FC = () => {
                   )}
 
                   {isAdmin && (
-                    <div className="flex items-center gap-2">
+                    <div className="grid grid-cols-3 gap-1.5">
                       <button
                         onClick={() => handleUpdateStatus(m.id, currentStatus === 'APPROVED' ? 'SUSPENDED' : 'APPROVED')}
-                        className={`flex-1 py-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-1 transition ${
+                        className={`py-2 px-1 rounded-xl border text-[11px] font-bold flex items-center justify-center gap-1 transition ${
                           currentStatus === 'APPROVED'
-                            ? 'bg-rose-500/10 text-rose-600 border-rose-500/20 hover:bg-rose-500 hover:text-white'
+                            ? 'bg-amber-500/10 text-amber-600 border-amber-500/20 hover:bg-amber-500 hover:text-white'
                             : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-600 hover:text-white'
                         }`}
+                        title={currentStatus === 'APPROVED' ? 'إيقاف المتجر مؤقتاً' : 'تفعيل المتجر'}
                       >
                         {currentStatus === 'APPROVED' ? (
                           <>
-                            <PauseCircle size={14} />
+                            <PauseCircle size={13} />
                             <span>توقف المتجر</span>
                           </>
                         ) : (
                           <>
-                            <CheckCircle2 size={14} />
-                            <span>تفعيل المتجر</span>
+                            <CheckCircle2 size={13} />
+                            <span>تفعيل</span>
                           </>
                         )}
                       </button>
 
                       <button
                         onClick={() => handleOpenEditModal(m)}
-                        className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-indigo-600 hover:text-white transition text-xs font-bold flex items-center gap-1 cursor-pointer"
+                        className="py-2 px-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-indigo-600 hover:text-white transition text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer"
                         title="تعديل بيانات المتجر"
                       >
-                        <Edit size={14} />
+                        <Edit size={13} />
                         <span>تعديل</span>
                       </button>
 
@@ -566,10 +582,10 @@ export const MerchantListPage: React.FC = () => {
                           setMerchantToDelete(m);
                           setIsDeleteModalOpen(true);
                         }}
-                        className="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-600 border border-red-500/20 text-red-600 dark:text-red-400 hover:text-white transition text-xs font-bold flex items-center gap-1 cursor-pointer"
+                        className="py-2 px-1 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] flex items-center justify-center gap-1 transition-all duration-150 shadow-md shadow-red-500/20 cursor-pointer"
                         title="حذف المتجر نهائياً"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={13} />
                         <span>حذف</span>
                       </button>
                     </div>
