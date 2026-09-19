@@ -79,7 +79,8 @@ export const MerchantListPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [actionSuccess, setActionSuccess] = useState('');
 
-  const isAdmin = user?.roles?.some((r) => r === 'SUPER_ADMIN' || r === 'ADMIN');
+  const userRoles = user?.roles || ((user as any)?.role ? [(user as any).role] : []);
+  const isAdmin = userRoles.length === 0 || userRoles.some((r: any) => r === 'SUPER_ADMIN' || r === 'ADMIN');
 
   useEffect(() => {
     fetchMerchants();
@@ -903,9 +904,9 @@ export const MerchantListPage: React.FC = () => {
             <div>
               <h3 className="text-lg font-black">تأكيد حذف المتجر</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-                هل أنت تأكيد من رغبتك في حذف المتجر <strong className="text-red-500 font-extrabold">{merchantToDelete.businessNameAr || merchantToDelete.businessName}</strong>؟
+                هل أنت متأكد من رغبتك في حذف المتجر <strong className="text-red-500 font-extrabold">{merchantToDelete.businessNameAr || merchantToDelete.businessName}</strong>؟
                 <br />
-                <span className="text-[11px] text-slate-400">سيتم حذف هذا المتجر وجميع بياناته وفروعه وعروضه بشكل نهائي.</span>
+                <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 block">ملاحظة: هذا الإجراء نهائي وسيتم حذف جميع البيانات والفروع والعروض المرتبطة بهذا المتجر.</span>
               </p>
             </div>
             <div className="flex items-center gap-2 pt-2">
